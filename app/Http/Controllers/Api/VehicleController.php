@@ -22,7 +22,7 @@ class VehicleController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $vehicle = Vehicle::find($id);
+        $vehicle = Vehicle::where('external_id', $id)->first();
 
         if (!$vehicle) {
             return response()->json([
