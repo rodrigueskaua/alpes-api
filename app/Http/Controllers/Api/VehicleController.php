@@ -20,8 +20,18 @@ class VehicleController extends Controller
         ]);
     }
 
-    public function show(Vehicle $vehicle): JsonResponse
+    public function show(int $id): JsonResponse
     {
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Veículo não encontrado.'
+            ], 404);
+        }
+
         return response()->json([
             'success' => true,
             'data' => $vehicle,
@@ -40,19 +50,39 @@ class VehicleController extends Controller
         ], 201);
     }
 
-    public function update(VehicleRequest $request, Vehicle $vehicle): JsonResponse
+    public function update(VehicleRequest $request, $id): JsonResponse
     {
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Veículo não encontrado.'
+            ], 404);
+        }
+
         $vehicle->update($request->validated());
 
         return response()->json([
             'success' => true,
             'data' => $vehicle,
-            'message' => 'Veículo atualizado.'
+            'message' => 'Veículo atualizado com sucesso.'
         ]);
     }
 
-    public function destroy(Vehicle $vehicle): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $vehicle = Vehicle::find($id);
+
+        if (!$vehicle) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Veículo não encontrado.'
+            ], 404);
+        }
+
         $vehicle->delete();
 
         return response()->json([
