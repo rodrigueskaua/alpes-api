@@ -3,10 +3,12 @@
 # Script de Deploy Laravel EC2
 # -------------------------------------------------------------------
 
-USER="ec2-user"
-HOST="3.20.235.172"
-APP_DIR="/home/ec2-user/alpes-api"
-SSH_KEY="/home/kauarodrigues/.ssh/ec2.pem"
+set -e
+
+DEPLOY_USER=$(grep '^DEPLOY_USER=' .env | cut -d '=' -f2-)
+DEPLOY_HOST=$(grep '^DEPLOY_HOST=' .env | cut -d '=' -f2-)
+DEPLOY_DIR=$(grep '^DEPLOY_DIR=' .env | cut -d '=' -f2-)
+DEPLOY_SSH_KEY=$(grep '^DEPLOY_SSH_KEY=' .env | cut -d '=' -f2- | sed 's/\\n/\n/g')
 
 erro() {
     echo "[ERRO] $1"
@@ -16,12 +18,19 @@ erro() {
 info() {
     echo "[INFO] $1"
 }
-
 info "Iniciando deploy"
 
-if [ ! -f "$SSH_KEY" ]; then
-    erro "Chave SSH não encontrada em $SSH_KEY"
-fi
+[ -z "$DEPLOY_USER" ] && erro "DEPLOY_USER não definido"
+[ -z "$DEPLOY_HOST" ] && erro "DEPLOY_HOST não definido"
+[ -z "$DEPLOY_DIR" ] && erro "DEPLOY_DIR não definido"
+[ -z "$DEPLOY_SSH_KEY" ] && erro "DEPLOY_SSH_KEY não definido"
+
+TEMP_KEY=$(mktemp)
+CLEAN_KEY=${DEPLOY_SSH_KEY#\"}
+CLEAN_KEY=${CLEAN_KEY%\"}
+printf "%b" "$CLEAN_KEY" > "$TEMP_KEY"
+chmod 600 "$TEMP_KEY"
+echo "[INFO] Arquivo temporário de chave criado em: $TEMP_KEY"
 
 if ! command -v rsync &> /dev/null; then
     erro "rsync não está instalado. Instale com: sudo yum install -y rsync"
@@ -55,18 +64,15 @@ Homestead.yaml
 Thumbs.db
 EOL
 
-info "Copiando arquivos para $HOST..."
-rsync -avz --delete --exclude-from="$EXCLUDE_FILE" ./ -e "ssh -i $SSH_KEY" $USER@$HOST:$APP_DIR
-if [ $? -ne 0 ]; then
-    erro "Falha ao copiar arquivos para o servidor"
-fi
+info "Copiando arquivos para $DEPLOY_HOST."
+rsync -avz --delete --exclude-from="$EXCLUDE_FILE" ./ -e "ssh -i $TEMP_KEY" $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR || erro "Falha ao copiar arquivos"
 
 rm -f $EXCLUDE_FILE
 
-info "Conectando ao servidor $HOST..."
-ssh -i $SSH_KEY $USER@$HOST << EOF
-    set -e  # interrompe execução em caso de erro
-    cd $APP_DIR || { echo "Diretório $APP_DIR não encontrado"; exit 1; }
+info "Conectando ao servidor $DEPLOY_HOST"
+ssh -i $TEMP_KEY $DEPLOY_USER@$DEPLOY_HOST << EOF
+    set -e
+    cd $DEPLOY_DIR || { echo "Diretório $DEPLOY_DIR não encontrado"; exit 1; }
 
     echo "[SERVER] Instalando dependências PHP..."
     composer install --no-dev --optimize-autoloader || { echo "[SERVER][ERRO] Falha ao instalar dependências"; exit 1; }
@@ -88,4 +94,5 @@ ssh -i $SSH_KEY $USER@$HOST << EOF
     echo "[SERVER] Deploy concluído com sucesso."
 EOF
 
+rm -f $TEMP_KEY
 info "Deploy finalizado."
