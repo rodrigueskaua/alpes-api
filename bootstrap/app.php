@@ -3,6 +3,11 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
-    ->withExceptions(function (Exceptions $exceptions) {
+    ->withExceptions(function ($exceptions) {
 
         $exceptions->render(function (Throwable $e, Request $request) {
 
@@ -35,20 +40,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 if ($e instanceof ValidationException) {
                     $response['message'] = 'Os dados fornecidos são inválidos.';
-                    if (method_exists($e, 'errors')) {
-                        $response['errors'] = $e->errors();
-                    } else {
-                        $response['errors'] = [];
-                    }
+                    $response['errors'] = method_exists($e, 'errors') ? $e->errors() : [];
                 } else if ($statusCode !== 500 || config('app.debug')) {
                     $response['message'] = $e->getMessage();
                 }
 
-                if ($response['message'] === '') {
-                    $response['message'] = 'Ocorreu um erro interno no servidor.';
-                }
-
                 return response()->json($response, $statusCode);
             }
+
         });
-    })->create();
+    })
+    ->create();
