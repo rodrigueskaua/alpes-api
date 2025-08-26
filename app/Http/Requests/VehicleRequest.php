@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class VehicleRequest extends FormRequest
 {
@@ -54,5 +56,15 @@ class VehicleRequest extends FormRequest
                 'photos' => json_decode($this->photos, true),
             ]);
         }
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Os dados fornecidos são inválidos.',
+            'errors'  => $validator->errors(),
+            'data'    => null,
+        ], 422));
     }
 }
