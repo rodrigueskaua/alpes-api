@@ -14,6 +14,41 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (Exceptions $exceptions) {
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+
+            if ($request->expectsJson()) {
+                $statusCode = match (true) {
+                    $e instanceof ValidationException => 422,
+                    $e instanceof AuthenticationException => 401,
+                    $e instanceof NotFoundHttpException => 404,
+                    method_exists($e, 'getStatusCode') => $e->getStatusCode(),
+                    default => 500,
+                };
+
+                $response = [
+                    'success' => false,
+                    'message' => 'Ocorreu um erro interno no servidor.',
+                    'data' => null,
+                ];
+
+                if ($e instanceof ValidationException) {
+                    $response['message'] = 'Os dados fornecidos são inválidos.';
+                    if (method_exists($e, 'errors')) {
+                        $response['errors'] = $e->errors();
+                    } else {
+                        $response['errors'] = [];
+                    }
+                } else if ($statusCode !== 500 || config('app.debug')) {
+                    $response['message'] = $e->getMessage();
+                }
+
+                if ($response['message'] === '') {
+                    $response['message'] = 'Ocorreu um erro interno no servidor.';
+                }
+
+                return response()->json($response, $statusCode);
+            }
+        });
     })->create();
