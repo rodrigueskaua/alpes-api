@@ -15,6 +15,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      - name: Adicionar host à lista de conhecidos
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 3.20.235.172 >> ~/.ssh/known_hosts
+
       - name: Deploy para EC2
         run: |
           ssh ec2-user@3.20.235.172 "
