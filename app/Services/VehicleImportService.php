@@ -10,12 +10,14 @@ class VehicleImportService
      * Cria ou atualiza um veículo a partir do array de dados da API.
      *
      * @param array $data Dados do veículo do JSON da API
-     * @return Vehicle
+     * @return array ['success' => bool, 'vehicle' => Vehicle]
      */
-    public function import(array $data): Vehicle
+    public function import(array $data): array
     {
-        return Vehicle::updateOrCreate(
-            ['external_id' => $data['id']],
+        $data['external_id'] = $data['id'] ?? $data['external_id'] ?? null;        
+        
+        $vehicle = Vehicle::updateOrCreate(
+            ['external_id' => $data['external_id']],
             [
                 'type' => $data['type'] ?? null,
                 'brand' => $data['brand'] ?? null,
@@ -40,5 +42,10 @@ class VehicleImportService
                 'photos' => $data['fotos'] ?? [],
             ]
         );
+
+        return [
+            'success' => true,
+            'vehicle' => $vehicle,
+        ];
     }
 }
