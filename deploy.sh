@@ -36,43 +36,15 @@ if ! command -v rsync &> /dev/null; then
     erro "rsync não está instalado. Instale com: sudo yum install -y rsync"
 fi
 
-EXCLUDE_FILE=$(mktemp)
-cat <<EOL > $EXCLUDE_FILE
-*.log
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
-Thumbs.db
-EOL
-
-info "Copiando arquivos para $DEPLOY_HOST."
-rsync -avz --delete --exclude-from="$EXCLUDE_FILE" ./ -e "ssh -i $TEMP_KEY" $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR || erro "Falha ao copiar arquivos"
-
-rm -f $EXCLUDE_FILE
-
 info "Conectando ao servidor $DEPLOY_HOST"
 ssh -i $TEMP_KEY $DEPLOY_USER@$DEPLOY_HOST << EOF
     set -e
     cd $DEPLOY_DIR || { echo "Diretório $DEPLOY_DIR não encontrado"; exit 1; }
+
+    echo "[SERVER] Atualizando código com git pull"
+    git fetch --all
+    git reset --hard origin/master
+    git pull origin master --ff-only || { echo "[SERVER][ERRO] Falha ao dar git pull"; exit 1; }
 
     echo "[SERVER] Instalando dependências PHP..."
     composer install --no-dev --optimize-autoloader || { echo "[SERVER][ERRO] Falha ao instalar dependências"; exit 1; }
