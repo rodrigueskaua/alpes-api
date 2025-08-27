@@ -6,12 +6,39 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Tag(
+ *   name="Logs",
+ *   description="Operações relacionadas aos logs do importador"
+ * )
+ */
 class LogController extends Controller
 {
     /**
-     * Exibe as linhas do log do importador.
-     * @param Request $request
-     * @return JsonResponse
+     * @OA\Get(
+     *   path="/api/v1/importer-logs",
+     *   tags={"Logs"},
+     *   summary="Exibe linhas do log do importador",
+     *   description="Retorna as linhas do arquivo de log do importador. Use o parâmetro 'lines' para definir a quantidade ou 'all' para todas.",
+     *   @OA\Parameter(
+     *     name="lines",
+     *     in="query",
+     *     description="Número de linhas a retornar ou 'all' para todas",
+     *     required=false,
+     *     @OA\Schema(type="string", example="100")
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Operação bem-sucedida",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="logs", type="array", @OA\Items(type="string"))
+     *     )
+     *   )
+     * )
      */
     public function index(Request $request): JsonResponse
     {

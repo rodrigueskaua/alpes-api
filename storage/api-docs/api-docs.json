@@ -6,6 +6,52 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/importer-logs": {
+            "get": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Exibe linhas do log do importador",
+                "description": "Retorna as linhas do arquivo de log do importador. Use o parâmetro 'lines' para definir a quantidade ou 'all' para todas.",
+                "operationId": "f6be7da3703c774fa346be032be6c559",
+                "parameters": [
+                    {
+                        "name": "lines",
+                        "in": "query",
+                        "description": "Número de linhas a retornar ou 'all' para todas",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operação bem-sucedida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "logs": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/vehicles": {
             "get": {
                 "tags": [
@@ -18,7 +64,7 @@
                     {
                         "name": "page",
                         "in": "query",
-                        "description": "Número da página (padrão 1, retorna 20 itens por página)",
+                        "description": "Número da página (padrão 1)",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -549,6 +595,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Logs",
+            "description": "Operações relacionadas aos logs do importador"
+        },
         {
             "name": "Vehicles",
             "description": "Operações relacionadas a veículos"
