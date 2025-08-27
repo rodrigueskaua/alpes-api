@@ -1,0 +1,545 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Alpes One - API de Veículos",
+        "description": "API para gerenciamento de veículos, com todos os detalhes e exemplos de dados.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/vehicles": {
+            "get": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "summary": "Listar veículos",
+                "description": "Retorna uma lista paginada de veículos.",
+                "operationId": "getVehiclesList",
+                "responses": {
+                    "200": {
+                        "description": "Operação bem-sucedida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Vehicle"
+                                                    }
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "from": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "to": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Lista de veículos carregada."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "summary": "Criar um novo veículo",
+                "description": "Cria um novo registro de veículo.",
+                "operationId": "storeVehicle",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VehicleRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Veículo criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Vehicle"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veículo criado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/vehicles/{id}": {
+            "get": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "summary": "Mostrar um veículo",
+                "description": "Retorna os dados de um único veículo pelo seu ID externo.",
+                "operationId": "getVehicleById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID externo do veículo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operação bem-sucedida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Vehicle"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veículo carregado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Veículo não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "summary": "Atualizar um veículo existente",
+                "description": "Atualiza os dados de um veículo existente.",
+                "operationId": "updateVehicle",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do veículo a ser atualizado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VehicleRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Veículo atualizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Vehicle"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veículo atualizado com sucesso."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Veículo não encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "summary": "Deletar um veículo",
+                "description": "Deleta um registro de veículo.",
+                "operationId": "deleteVehicle",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do veículo a ser deletado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Veículo deletado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Veículo deletado com sucesso."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Veículo não encontrado"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Vehicle": {
+                "title": "Vehicle Model",
+                "description": "Representa um veículo com todos os seus detalhes.",
+                "properties": {
+                    "id": {
+                        "description": "ID interno do veículo no banco de dados.",
+                        "type": "integer",
+                        "example": 41
+                    },
+                    "external_id": {
+                        "description": "ID externo do veículo (para referência).",
+                        "type": "integer",
+                        "example": 125306
+                    },
+                    "type": {
+                        "description": "Tipo do veículo (ex: carro, moto).",
+                        "type": "string",
+                        "example": "carro"
+                    },
+                    "brand": {
+                        "description": "Marca do veículo.",
+                        "type": "string",
+                        "example": "Hyundai"
+                    },
+                    "model": {
+                        "description": "Modelo do veículo.",
+                        "type": "string",
+                        "example": "CRETA"
+                    },
+                    "version": {
+                        "description": "Versão específica do modelo.",
+                        "type": "string",
+                        "example": "CRETA 16A ACTION"
+                    },
+                    "year_model": {
+                        "description": "Ano do modelo.",
+                        "type": "string",
+                        "example": "2025"
+                    },
+                    "year_build": {
+                        "description": "Ano de fabricação.",
+                        "type": "string",
+                        "example": "2025"
+                    },
+                    "optionals": {
+                        "description": "Lista de opcionais do veículo.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "doors": {
+                        "description": "Número de portas.",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "board": {
+                        "description": "Placa do veículo.",
+                        "type": "string",
+                        "example": "JCU2I93"
+                    },
+                    "chassi": {
+                        "description": "Número do chassi.",
+                        "type": "string",
+                        "example": "123456789"
+                    },
+                    "transmission": {
+                        "description": "Tipo de transmissão.",
+                        "type": "string",
+                        "example": "Automática"
+                    },
+                    "km": {
+                        "description": "Quilometragem do veículo.",
+                        "type": "integer",
+                        "example": 24208
+                    },
+                    "description": {
+                        "description": "Descrição e observações sobre o veículo.",
+                        "type": "string",
+                        "example": "*revisado *procedência *garantia"
+                    },
+                    "sold": {
+                        "description": "Indica se o veículo foi vendido.",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "category": {
+                        "description": "Categoria do veículo.",
+                        "type": "string",
+                        "example": "SUV"
+                    },
+                    "url_car": {
+                        "description": "URL amigável para o veículo.",
+                        "type": "string",
+                        "example": "hyundai-creta-2025-automatica-125306"
+                    },
+                    "old_price": {
+                        "description": "Preço antigo (para promoções).",
+                        "type": "string",
+                        "format": "decimal",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "price": {
+                        "description": "Preço atual do veículo.",
+                        "type": "string",
+                        "format": "decimal",
+                        "example": "115900.00"
+                    },
+                    "color": {
+                        "description": "Cor do veículo.",
+                        "type": "string",
+                        "example": "Branco"
+                    },
+                    "fuel": {
+                        "description": "Tipo de combustível.",
+                        "type": "string",
+                        "example": "Flex"
+                    },
+                    "photos": {
+                        "description": "Lista de URLs das fotos do veículo.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "url"
+                        }
+                    },
+                    "created_at": {
+                        "description": "Data de criação do registro.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Data da última atualização do registro.",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "VehicleRequest": {
+                "title": "Vehicle Request Body",
+                "description": "Corpo da requisição para criar ou atualizar um veículo. Apenas 'external_id' e 'price' são obrigatórios.",
+                "required": [
+                    "external_id",
+                    "price"
+                ],
+                "properties": {
+                    "external_id": {
+                        "description": "ID externo do veículo (obrigatório).",
+                        "type": "integer",
+                        "example": 125307
+                    },
+                    "price": {
+                        "description": "Preço do veículo (obrigatório).",
+                        "type": "string",
+                        "format": "decimal",
+                        "example": "150000.00"
+                    },
+                    "type": {
+                        "description": "Tipo do veículo (opcional).",
+                        "type": "string",
+                        "example": "carro"
+                    },
+                    "brand": {
+                        "description": "Marca do veículo (opcional).",
+                        "type": "string",
+                        "example": "Fiat"
+                    },
+                    "model": {
+                        "description": "Modelo do veículo (opcional).",
+                        "type": "string",
+                        "example": "Toro"
+                    },
+                    "version": {
+                        "description": "Versão do modelo (opcional).",
+                        "type": "string",
+                        "example": "1.3 Turbo 270"
+                    },
+                    "year_model": {
+                        "description": "Ano do modelo (opcional).",
+                        "type": "string",
+                        "example": "2025"
+                    },
+                    "year_build": {
+                        "description": "Ano de fabricação (opcional).",
+                        "type": "string",
+                        "example": "2025"
+                    },
+                    "km": {
+                        "description": "Quilometragem (opcional).",
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "color": {
+                        "description": "Cor do veículo (opcional).",
+                        "type": "string",
+                        "example": "Preto"
+                    },
+                    "doors": {
+                        "description": "Número de portas (opcional).",
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "board": {
+                        "description": "Placa do veículo (opcional).",
+                        "type": "string",
+                        "example": "XYZ5678"
+                    },
+                    "chassi": {
+                        "description": "Número do chassi (opcional).",
+                        "type": "string"
+                    },
+                    "transmission": {
+                        "description": "Tipo de transmissão (opcional).",
+                        "type": "string",
+                        "example": "Automática"
+                    },
+                    "description": {
+                        "description": "Descrição (opcional).",
+                        "type": "string"
+                    },
+                    "category": {
+                        "description": "Categoria (opcional).",
+                        "type": "string",
+                        "example": "Picape"
+                    },
+                    "fuel": {
+                        "description": "Tipo de combustível (opcional).",
+                        "type": "string",
+                        "example": "Flex"
+                    },
+                    "optionals": {
+                        "description": "Lista de opcionais (opcional).",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "photos": {
+                        "description": "Lista de URLs das fotos (opcional).",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "url"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Vehicles",
+            "description": "Operações relacionadas a veículos"
+        }
+    ]
+}
