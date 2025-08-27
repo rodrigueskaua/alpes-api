@@ -2,6 +2,42 @@
 
 Esta Documentação detalha todos os passos necessários para configurar, executar, testar e implantar a aplicação **Alpes One API**. Aborda o ambiente de desenvolvimento local com Laravel Sail (Docker) e o deploy no ambiente de produção na AWS EC2.
 
+## Contexto do Projeto
+
+O **Alpes One API** foi desenvolvido como parte de um desafio técnico, com o intuito de demonstrar boas práticas em **desenvolvimento backend**, **infraestrutura em nuvem** e **processos de automação**.  
+
+As principais tecnologias e ferramentas utilizadas foram:
+
+- **Laravel (PHP 8+)** – Framework principal para construção da API.  
+- **MySQL** – Banco de dados relacional utilizado.  
+- **Docker + Laravel Sail** – Gerenciamento de ambiente de desenvolvimento padronizado.  
+- **AWS EC2** – Hospedagem em servidor cloud de produção.  
+- **Nginx** – Servidor web configurado para rodar a aplicação em produção.  
+- **Certbot + Let's Encrypt** – Geração e renovação automática de certificados SSL.  
+- **GitHub Actions** – Pipeline de **CI/CD** para deploy automatizado.  
+- **Swagger (L5-Swagger)** – Documentação interativa da API.  
+
+### Principais Links
+
+- **Documentação da API (Swagger):** [https://alpesapi.kauarodrigues.dev/api/documentation](https://alpesapi.kauarodrigues.dev/api/documentation)  
+- **Endpoint de Produção:** [https://alpesapi.kauarodrigues.dev](https://alpesapi.kauarodrigues.dev)  
+
+### Endpoints da API
+
+#### Logs  
+Operações relacionadas aos logs do importador:  
+
+- **GET** `/api/v1/log/vehicles` → Exibe linhas do log do importador  
+
+#### Vehicles  
+Operações relacionadas a veículos:  
+
+- **GET** `/api/v1/vehicles` → Listar veículos  
+- **POST** `/api/v1/vehicles` → Criar um novo veículo  
+- **GET** `/api/v1/vehicles/{id}` → Mostrar um veículo  
+- **PUT** `/api/v1/vehicles/{id}` → Atualizar um veículo existente  
+- **DELETE** `/api/v1/vehicles/{id}` → Deletar um veículo  
+
 ## Objetivo do Projeto
 
 Desenvolver uma API em Laravel para gerenciar veículos importados de um JSON remoto. O projeto demonstra habilidades em desenvolvimento backend, testes automatizados, infraestrutura AWS e práticas de DevOps (CI/CD).
