@@ -2,18 +2,27 @@ name: Deploy Laravel EC2
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configurar chave SSH
-        uses: webfactory/ssh-agent@v0.7.0
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          php-version: 8.2
+
+      - name: Configurar chave SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          echo "$PRIVATE_KEY" > github-ec2.pem
+          chmod 600 github-ec2.pem
 
       - name: Adicionar host à lista de conhecidos
         run: |
@@ -21,13 +30,28 @@ jobs:
           ssh-keyscan -H 3.20.235.172 >> ~/.ssh/known_hosts
 
       - name: Deploy para EC2
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
         run: |
-          ssh ec2-user@3.20.235.172 "
-            cd /home/ec2-user/alpes-api &&
-            git reset --hard &&
-            git pull origin master &&
-            composer install --no-dev --optimize-autoloader &&
-            php artisan migrate --force &&
-            php artisan config:cache &&
+          ssh -o StrictHostKeyChecking=no -i github-ec2.pem ${USER}@${HOST} '
+            cd /home/ec2-user/alpes-api
+
+            echo "Atualizando código"
+            git reset --hard
+            git pull origin master
+
+            echo "Instalando dependências PHP"
+            composer install --no-dev --optimize-autoloader
+
+            echo "Rodando migrations..."
+            php artisan migrate --force
+
+            echo "Limpando e cacheando config"
+            php artisan config:cache
+
+            echo "Reiniciando serviços"
             sudo systemctl restart php-fpm nginx
-          "
+
+            echo "Deploy concluído"
+          '
