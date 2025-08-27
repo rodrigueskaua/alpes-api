@@ -18,7 +18,7 @@ class LogController extends Controller
 {
     /**
      * @OA\Get(
-     *   path="/api/v1/importer-logs",
+     *   path="/api/v1/log/vehicles",
      *   tags={"Logs"},
      *   summary="Exibe linhas do log do importador",
      *   description="Retorna as linhas do arquivo de log do importador. Use o parâmetro 'lines' para definir a quantidade ou 'all' para todas.",
