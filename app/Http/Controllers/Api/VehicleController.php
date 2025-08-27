@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VehicleRequest;
+use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Annotations as OA;
@@ -79,37 +80,46 @@ use OpenApi\Annotations as OA;
 class VehicleController extends Controller
 {
     /**
-     * @OA\Get(
-     * path="/api/v1/vehicles",
-     * operationId="getVehiclesList",
-     * tags={"Vehicles"},
-     * summary="Listar veículos",
-     * description="Retorna uma lista paginada de veículos.",
-     * @OA\Response(
-     * response=200,
-     * description="Operação bem-sucedida",
-     * @OA\JsonContent(
-     * type="object",
-     * @OA\Property(property="success", type="boolean", example=true),
-     * @OA\Property(property="data", type="object",
-     * @OA\Property(property="current_page", type="integer"),
-     * @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Vehicle")),
-     * @OA\Property(property="first_page_url", type="string"),
-     * @OA\Property(property="from", type="integer"),
-     * @OA\Property(property="last_page", type="integer"),
-     * @OA\Property(property="last_page_url", type="string"),
-     * @OA\Property(property="next_page_url", type="string", nullable=true),
-     * @OA\Property(property="path", type="string"),
-     * @OA\Property(property="per_page", type="integer"),
-     * @OA\Property(property="prev_page_url", type="string", nullable=true),
-     * @OA\Property(property="to", type="integer"),
-     * @OA\Property(property="total", type="integer"),
-     * ),
-     * @OA\Property(property="message", type="string", example="Lista de veículos carregada.")
-     * )
-     * )
-     * )
-     */
+    @OA\Get(
+        path="/api/v1/vehicles",
+        operationId="getVehiclesList",
+        tags={"Vehicles"},
+        summary="Listar veículos",
+        description="Retorna uma lista paginada de veículos.",
+
+        @OA\Parameter(
+            name="page",
+            in="query",
+            description="Número da página (padrão 1)",
+            required=false,
+            @OA\Schema(type="integer", default=1)
+        ),
+
+        @OA\Response(
+            response=200,
+            description="Operação bem-sucedida",
+            @OA\JsonContent(
+                type="object",
+                @OA\Property(property="success", type="boolean", example=true),
+                @OA\Property(property="data", type="object",
+                    @OA\Property(property="current_page", type="integer"),
+                    @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Vehicle")),
+                    @OA\Property(property="first_page_url", type="string"),
+                    @OA\Property(property="from", type="integer"),
+                    @OA\Property(property="last_page", type="integer"),
+                    @OA\Property(property="last_page_url", type="string"),
+                    @OA\Property(property="next_page_url", type="string", nullable=true),
+                    @OA\Property(property="path", type="string"),
+                    @OA\Property(property="per_page", type="integer"),
+                    @OA\Property(property="prev_page_url", type="string", nullable=true),
+                    @OA\Property(property="to", type="integer"),
+                    @OA\Property(property="total", type="integer"),
+                ),
+                @OA\Property(property="message", type="string", example="Lista de veículos carregada.")
+            )
+        )
+    )
+    */
     public function index(): JsonResponse
     {
         $vehicles = Vehicle::orderBy('external_id', 'asc')->paginate(20);
@@ -237,7 +247,7 @@ class VehicleController extends Controller
      * )
      * )
      */
-    public function update(VehicleRequest $request, $id): JsonResponse
+    public function update(UpdateVehicleRequest $request, $id): JsonResponse
     {
         $vehicle = Vehicle::find($id);
 
