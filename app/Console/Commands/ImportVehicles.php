@@ -24,13 +24,13 @@ class ImportVehicles extends Command
         $url = 'https://hub.alpes.one/api/v1/integrator/export/1902';
 
         $this->info('Importação iniciada em: ' . now()->format('Y-m-d H:i:s'));
-        Log::info('Importação iniciada', ['url' => $url, 'executed_at' => now()]);
+        Log::channel('importer')->info('Importação iniciada', ['url' => $url, 'executed_at' => now()]);
 
         $response = Http::get($url);
 
         if (!$response->ok()) {
             $this->error('Falha ao acessar a API');
-            Log::error('Falha ao acessar a API', ['url' => $url, 'status' => $response->status()]);
+            Log::channel('importer')->error('Falha ao acessar a API', ['url' => $url, 'status' => $response->status()]);
             return 1;
         }
 
@@ -42,20 +42,20 @@ class ImportVehicles extends Command
             if (!isset($data['id'])) {
                 $skipped++;
                 $this->warn('Veículo ignorado por dados incompletos.');
-                Log::warning('Veículo ignorado', ['data' => $data]);
+                Log::channel('importer')->warning('Veículo ignorado', ['data' => $data]);
                 continue;
             }
 
             $this->vehicleService->import($data);
             $processed++;
-            Log::info('Veículo importado', ['external_id' => $data['id']]);
+            Log::channel('importer')->info('Veículo importado', ['external_id' => $data['id']]);
         }
 
         $this->info('Importação concluída em: ' . now()->format('Y-m-d H:i:s'));
         $this->info("Veículos processados: $processed");
         $this->info("Veículos ignorados: $skipped");
 
-        Log::info('Importação finalizada', [
+        Log::channel('importer')->info('Importação finalizada', [
             'processed' => $processed,
             'skipped' => $skipped,
             'executed_at' => now()->toDateTimeString(),
