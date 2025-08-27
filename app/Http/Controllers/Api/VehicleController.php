@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VehicleRequest;
+use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Annotations as OA;
@@ -246,7 +247,7 @@ class VehicleController extends Controller
      * )
      * )
      */
-    public function update(VehicleRequest $request, $id): JsonResponse
+    public function update(UpdateVehicleRequest $request, $id): JsonResponse
     {
         $vehicle = Vehicle::find($id);
 
